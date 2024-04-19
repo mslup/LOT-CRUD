@@ -38,7 +38,7 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         // Then
         assertThat(returnedFlight).isPresent();
         assertThat(returnedFlight.get().getId()).isEqualTo(1);
-        assertThat(flight).usingRecursiveComparison().isEqualTo(returnedFlight);
+        assertThat(returnedFlight.get()).usingRecursiveComparison().isEqualTo(flight);
     }
 
     @Test
