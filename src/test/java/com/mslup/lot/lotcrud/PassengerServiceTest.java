@@ -80,4 +80,20 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         assertThat(patchedPassenger.orElseThrow().getPhoneNumber()).isEqualTo(
             passenger.orElseThrow().getPhoneNumber());
     }
+
+    @Test
+    @Order(4)
+    public void givenPassengers_whenDelete_thenDeleted() {
+        // Given
+
+        // When
+        passengerService.deletePassenger(3);
+
+        // Then
+        List<Passenger> passengers = passengerService.getAllPassengers();
+        assertThat(passengers.size()).isEqualTo(4);
+
+        Optional<Passenger> passenger = passengerService.findPassenger(3);
+        assertThat(passenger).isNotPresent();
+    }
 }

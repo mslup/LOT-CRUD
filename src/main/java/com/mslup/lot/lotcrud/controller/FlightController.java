@@ -15,6 +15,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +43,14 @@ public class FlightController {
         return new ResponseEntity<>(flightService.saveFlight(flight), HttpStatus.CREATED);
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseBody
+    public ResponseEntity<Flight> getFlight(@PathVariable long id) {
+        return flightService.findFlight(id)
+            .map(ResponseEntity::ok)
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @PatchMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<Flight> updateFlight(
@@ -65,6 +74,13 @@ public class FlightController {
         } catch (FlightNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
+    @DeleteMapping(path = "/{id}")
+    @ResponseBody
+    public ResponseEntity<Flight> deleteFlight(@PathVariable long id) {
+        return flightService.deleteFlight(id)
+            .map(ResponseEntity::ok)
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

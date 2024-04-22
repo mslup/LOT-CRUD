@@ -54,4 +54,10 @@ public class PassengerService {
         passengerRepository.save(patchedPassenger);
         return patchedPassenger;
     }
+
+    public Optional<Passenger> deletePassenger(long id) {
+        Optional<Passenger> passenger = passengerRepository.findById(id);
+        passengerRepository.deleteById(id);
+        return passenger;
+    }
 }

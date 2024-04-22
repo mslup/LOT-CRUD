@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
 import com.mslup.lot.lotcrud.model.Flight;
+import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.FlightService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -86,5 +87,21 @@ public class FlightServiceTest extends LotCrudApplicationTests {
             flight.get().getOriginAirport());
         assertThat(patchedFlight.orElseThrow().getDepartureDateTime()).isEqualTo(
             flight.get().getDepartureDateTime());
+    }
+
+    @Test
+    @Order(4)
+    public void givenFlights_whenDelete_thenDeleted() {
+        // Given
+
+        // When
+        flightService.deleteFlight(4);
+
+        // Then
+        List<Flight> flights = flightService.getAllFlights();
+        assertThat(flights.size()).isEqualTo(4);
+
+        Optional<Flight> flight = flightService.findFlight(4);
+        assertThat(flight).isNotPresent();
     }
 }

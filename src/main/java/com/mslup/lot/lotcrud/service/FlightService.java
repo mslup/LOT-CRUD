@@ -2,6 +2,7 @@ package com.mslup.lot.lotcrud.service;
 
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
 import com.mslup.lot.lotcrud.model.Flight;
+import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.repository.FlightRepository;
 import java.util.List;
 import java.util.Optional;
@@ -52,5 +53,11 @@ public class FlightService {
         Flight patchedFlight = applyPatchToFlight(flight, valuesToPatch);
         flightRepository.save(patchedFlight);
         return patchedFlight;
+    }
+
+    public Optional<Flight> deleteFlight(long id) {
+        Optional<Flight> flight = flightRepository.findById(id);
+        flightRepository.deleteById(id);
+        return flight;
     }
 }

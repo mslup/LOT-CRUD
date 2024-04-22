@@ -1,8 +1,5 @@
 package com.mslup.lot.lotcrud.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.PassengerService;
@@ -11,6 +8,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,8 +32,17 @@ public class PassengerController {
     }
 
     @PostMapping
+    @ResponseBody
     public ResponseEntity<Passenger> addPassenger(@RequestBody Passenger passenger) {
         return new ResponseEntity<>(passengerService.savePassenger(passenger), HttpStatus.CREATED);
+    }
+
+    @GetMapping(path = "/{id}")
+    @ResponseBody
+    public ResponseEntity<Passenger> getPassenger(@PathVariable long id) {
+        return passengerService.findPassenger(id)
+            .map(ResponseEntity::ok)
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PatchMapping(path = "/{id}")
@@ -57,7 +64,14 @@ public class PassengerController {
         } catch (PassengerNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
+    @DeleteMapping(path = "/{id}")
+    @ResponseBody
+    public ResponseEntity<Passenger> deletePassenger(@PathVariable long id) {
+        return passengerService.deletePassenger(id)
+            .map(ResponseEntity::ok)
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
 
