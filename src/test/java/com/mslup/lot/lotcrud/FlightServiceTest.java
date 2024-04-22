@@ -3,7 +3,6 @@ package com.mslup.lot.lotcrud;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.mslup.lot.lotcrud.controller.FlightController;
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
 import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
@@ -12,8 +11,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Filter;
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
