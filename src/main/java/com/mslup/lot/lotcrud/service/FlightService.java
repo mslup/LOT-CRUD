@@ -1,8 +1,8 @@
 package com.mslup.lot.lotcrud.service;
 
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
+import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
-import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.repository.FlightRepository;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +22,12 @@ public class FlightService {
         return flightRepository.findById(id);
     }
 
-    public List<Flight> getAllFlights() {
+    public List<Flight> getFlights() {
         return flightRepository.findAll();
+    }
+
+    public List<Flight> getFlights(FlightFilterCriteria criteria) {
+        return flightRepository.filterFlights(criteria);
     }
 
     private Flight applyPatchToFlight(Flight flight, Flight valuesToPatch) {

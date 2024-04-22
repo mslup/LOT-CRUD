@@ -1,14 +1,9 @@
 package com.mslup.lot.lotcrud.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
-import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
+import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
-import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.FlightService;
-import java.lang.reflect.Field;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +29,24 @@ public class FlightController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<Flight>> getFlights() {
-        return ResponseEntity.ok(flightService.getAllFlights());
+    public ResponseEntity<List<Flight>> getFlights(
+        @RequestParam Optional<String> originAirport,
+        @RequestParam Optional<String> destinationAirport,
+        @RequestParam Optional<OffsetDateTime> dateFrom,
+        @RequestParam Optional<OffsetDateTime> dateTo,
+        @RequestParam Optional<Long> seatsCountFrom,
+        @RequestParam Optional<Long> seatsCountTo
+    ) {
+        FlightFilterCriteria criteria = FlightFilterCriteria.builder()
+            .originAirport(originAirport.orElse(null))
+            .destinationAirport(destinationAirport.orElse(null))
+            .dateFrom(dateFrom.orElse(null))
+            .dateTo(dateTo.orElse(null))
+            .seatsCountFrom(seatsCountFrom.orElse(null))
+            .seatsCountTo(seatsCountTo.orElse(null))
+            .build();
+
+        return ResponseEntity.ok(flightService.getFlights(criteria));
     }
 
     @PostMapping
