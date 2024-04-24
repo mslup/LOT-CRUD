@@ -12,12 +12,21 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repozytorium implementujące niestandardowe zapytania w tablicy lotów.
+ */
 @Repository
 @RequiredArgsConstructor
 public class FlightRepositoryCustomImpl implements FlightRepositoryCustom {
     private final EntityManager em;
 
 
+    /**
+     * Filtruje loty na podstawie określonych kryteriów.
+     *
+     * @param criteria Kryteria filtrowania lotów.
+     * @return Lista lotów spełniających podane kryteria.
+     */
     @Override
     public List<Flight> filterFlights(FlightFilterCriteria criteria) {
         CriteriaBuilder cb = em.getCriteriaBuilder();

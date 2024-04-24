@@ -8,23 +8,50 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Serwis obsługujący operacje na pasażerach.
+ */
 @Service
 @RequiredArgsConstructor
 public class PassengerService {
     private final PassengerRepository passengerRepository;
 
+    /**
+     * Pobiera wszystkich pasażerów.
+     *
+     * @return Lista wszystkich pasażerów.
+     */
     public List<Passenger> getAllPassengers() {
         return passengerRepository.findAll();
     }
 
+    /**
+     * Znajduje pasażera o podanym ID.
+     *
+     * @param id ID pasażera do znalezienia.
+     * @return Pasażer o podanym ID, jeśli istnieje.
+     */
     public Optional<Passenger> findPassenger(long id) {
         return passengerRepository.findById(id);
     }
 
+    /**
+     * Zapisuje pasażera.
+     *
+     * @param passenger Pasażer do zapisania.
+     * @return Zapisany pasażer.
+     */
     public Passenger savePassenger(Passenger passenger) {
         return passengerRepository.save(passenger);
     }
 
+    /**
+     * Metoda pomocnicza do zastosowania zmiany na pasażerze.
+     *
+     * @param passenger Aktualny pasażer.
+     * @param valuesToPatch Wartości do zaktualizowania.
+     * @return Zaktualizowany pasażer.
+     */
     private Passenger applyPatchToPassenger(Passenger passenger, Passenger valuesToPatch) {
         if (valuesToPatch.getFirstName() != null) {
             passenger.setFirstName(valuesToPatch.getFirstName());
@@ -38,6 +65,14 @@ public class PassengerService {
         return passenger;
     }
 
+    /**
+     * Aktualizuje dane pasażera na podstawie podanego ID i wartości do zaktualizowania.
+     *
+     * @param id ID pasażera do zaktualizowania.
+     * @param valuesToPatch Wartości do zaktualizowania.
+     * @return Zaktualizowany pasażer.
+     * @throws PassengerNotFoundException Jeśli pasażer o podanym ID nie zostanie znaleziony.
+     */
     public Passenger patchPassenger(long id, Passenger valuesToPatch)
         throws PassengerNotFoundException {
         Passenger passenger = findPassenger(id).orElseThrow(PassengerNotFoundException::new);
@@ -47,6 +82,12 @@ public class PassengerService {
         return patchedPassenger;
     }
 
+    /**
+     * Usuwa pasażera o podanym ID.
+     *
+     * @param id ID pasażera do usunięcia.
+     * @return Opcjonalny pasażer, jeśli został usunięty.
+     */
     public Optional<Passenger> deletePassenger(long id) {
         Optional<Passenger> passenger = passengerRepository.findById(id);
         passengerRepository.deleteById(id);

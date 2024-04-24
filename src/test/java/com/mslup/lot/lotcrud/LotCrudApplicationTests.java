@@ -32,6 +32,7 @@ class LotCrudApplicationTests {
 		environment.start();
 	}
 
+
 	@DynamicPropertySource
 	public static void overrideProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.datasource.url", () -> String.format(POSTGRES_JDBC,

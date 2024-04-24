@@ -19,24 +19,44 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Kontroler obsługujący zasoby pasażerów.
+ */
 @RestController
 @RequestMapping("/passengers")
 @RequiredArgsConstructor
 public class PassengerController {
     private final PassengerService passengerService;
 
+    /**
+     * Pobiera listę wszystkich pasażerów.
+     *
+     * @return ResponseEntity z listą pasażerów.
+     */
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<Passenger>> getPassengers() {
         return ResponseEntity.ok(passengerService.getAllPassengers());
     }
 
+    /**
+     * Dodaje nowego pasażera.
+     *
+     * @param passenger Pasażer do dodania.
+     * @return ResponseEntity z dodanym pasażerem.
+     */
     @PostMapping
     @ResponseBody
     public ResponseEntity<Passenger> addPassenger(@RequestBody Passenger passenger) {
         return new ResponseEntity<>(passengerService.savePassenger(passenger), HttpStatus.CREATED);
     }
 
+    /**
+     * Pobiera szczegóły pasażera na podstawie ID.
+     *
+     * @param id ID pasażera.
+     * @return ResponseEntity z pasażerem lub kodem NOT_FOUND, jeśli pasażer nie istnieje.
+     */
     @GetMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<Passenger> getPassenger(@PathVariable long id) {
@@ -45,6 +65,16 @@ public class PassengerController {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Aktualizuje szczegóły pasażera na podstawie ID.
+     *
+     * @param id          ID pasażera.
+     * @param firstName   Opcjonalne: nowe imię pasażera.
+     * @param lastName    Opcjonalne: nowe nazwisko pasażera.
+     * @param phoneNumber Opcjonalne: nowy numer telefonu pasażera.
+     * @return ResponseEntity z zaktualizowanym pasażerem lub kodem NOT_FOUND,
+     *      jeśli pasażer nie istnieje.
+     */
     @PatchMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<Passenger> updatePassenger(
@@ -66,6 +96,12 @@ public class PassengerController {
         }
     }
 
+    /**
+     * Usuwa pasażera na podstawie ID.
+     *
+     * @param id ID pasażera.
+     * @return ResponseEntity z kodem OK lub kodem NOT_FOUND, jeśli pasażer nie istnieje.
+     */
     @DeleteMapping(path = "/{id}")
     @ResponseBody
     public ResponseEntity<Passenger> deletePassenger(@PathVariable long id) {
@@ -74,5 +110,3 @@ public class PassengerController {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
-
-

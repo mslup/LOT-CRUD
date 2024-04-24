@@ -1,12 +1,15 @@
 package com.mslup.lot.lotcrud;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
+import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
+import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.FlightService;
+import com.mslup.lot.lotcrud.service.PassengerService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -23,9 +26,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class FlightServiceTest extends LotCrudApplicationTests {
     @Autowired
     private FlightService flightService;
+    @Autowired
+    private PassengerService passengerService;
 
 
-    // todo: add example flights before all, same with passengers
+    // todo: add example data before all tests, remove passengerService
     @Test
     @Order(1)
     public void givenFlight_whenAddFlight_thenFlightIsAdded() {
@@ -33,7 +38,7 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         Flight flight = Flight.builder()
             .destinationAirport("WWA")
             .originAirport("NYC")
-            .departureDateTime(OffsetDateTime.of(2024, 5, 15, 14, 32, 0, 0, ZoneOffset.ofHours(1)))
+            //.departureDateTime(OffsetDateTime.of(2024, 5, 15, 14, 32, 0, 0, ZoneOffset.ofHours(1)))
             .availableSeatsCount(23)
             .build();
 
@@ -67,20 +72,22 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     public void givenFlight_whenPatch_thenPatchedCorrectly() {
         // Given
         Optional<Flight> flight = flightService.findFlight(1);
+        assertThat(flight).isPresent();
         Flight patch = Flight.builder()
             .destinationAirport("BUD")
-            .availableSeatsCount(200L)
+            .availableSeatsCount(200)
             .build();
 
         // When
         try {
             flightService.patchFlight(1, patch);
         } catch (FlightNotFoundException e) {
-            fail();
+            fail("Flight with id = 1 not found");
         }
 
         // Then
         Optional<Flight> patchedFlight = flightService.findFlight(1);
+
         assertThat(patchedFlight.orElseThrow().getDestinationAirport()).isEqualTo("BUD");
         assertThat(patchedFlight.orElseThrow().getAvailableSeatsCount()).isEqualTo(200L);
         assertThat(patchedFlight.orElseThrow().getFlightNumber()).isEqualTo(
@@ -154,7 +161,6 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     public void givenDateFromOrTo_whenFilter_thenReturnCorrect() {
         // Given
         // todo: parsing datetime
-        flightService.deleteFlight(1);
         {
             flightService.saveFlight(Flight.builder()
                 .departureDateTime(OffsetDateTime.of(2024,
@@ -265,4 +271,65 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     }
 
     // todo: tests for seatcount? test for multicriteria
+
+
+
+    @Test
+    @Order(8)
+    //@Transactional
+    public void givenFlight_whenAddPassenger_thenPassengerIsAdded() {
+        // Given
+        Optional<Flight> flight = flightService.findFlight(1);
+        assertThat(flight).isPresent();
+        long seatsCount = flight.get().getAvailableSeatsCount();
+
+        passengerService.savePassenger(Passenger.builder().build());
+
+        // When
+        try {
+            flightService.addPassenger(1, 1);
+        } catch (PassengerNotFoundException e) {
+            fail("Passenger with id = 1 not found");
+        } catch (FlightNotFoundException e) {
+            fail("Flight with id = 1 not found");
+        }
+
+        // Then
+        Optional<Flight> flightAfter = flightService.findFlight(1);
+        assertThat(flightAfter).isPresent();
+        assertThat(flightAfter.get().getAvailableSeatsCount()).isEqualTo(seatsCount - 1);
+        assertThat(flightAfter.get().getPassengers())
+            .extracting(Passenger::getId)
+            .contains(1L);
+        Optional<Passenger> passenger = passengerService.findPassenger(1);
+        assertThat(passenger).isPresent();
+        assertThat(passenger.get().getBookings().size()).isEqualTo(1);
+        assertThat(passenger.get().getBookings()).extracting(Flight::getId).contains(1L);
+    }
+
+    @Test
+    @Order(9)
+    public void givenFlight_whenDeletePassenger_thenPassengerIsDeleted() {
+        // Given
+        Optional<Flight> flight = flightService.findFlight(1);
+        assertThat(flight).isPresent();
+        long seatsCount = flight.get().getAvailableSeatsCount();
+
+        // When
+        try {
+            flightService.deletePassenger(1, 1);
+        } catch (FlightNotFoundException e) {
+            fail("Flight with id = 1 not found");
+        }
+
+        // Then
+        Optional<Flight> flightAfter = flightService.findFlight(1);
+        assertThat(flightAfter).isPresent();
+        assertThat(flightAfter.get().getAvailableSeatsCount()).isEqualTo(seatsCount + 1);
+        assertThat(flightAfter.get().getPassengers().size()).isEqualTo(0);
+        Optional<Passenger> passenger = passengerService.findPassenger(1);
+        assertThat(passenger).isPresent();
+        assertThat(passenger.get().getBookings().size()).isEqualTo(0);
+    }
+
 }
