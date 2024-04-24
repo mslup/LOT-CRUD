@@ -1,5 +1,7 @@
 package com.mslup.lot.lotcrud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mslup.lot.lotcrud.exception.NoAvailableSeatsException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,33 +36,47 @@ public class Flight {
     @GeneratedValue
     private long id;
 
-    // Numer lotu.
+    /**
+     * Numer lotu.
+     */
     @Column(nullable = true)
+    //@NotNull(message = "Flight number cannot be null - model")
     private String flightNumber;
 
-    // Kod lotniska początkowego.
+    /**
+     * Kod lotniska początkowego.
+     */
     @Column(nullable = true)
     private String originAirport;
 
-    // Kod lotniska docelowego.
+    /**
+     * Kod lotniska docelowego.
+     */
     @Column(nullable = true)
     private String destinationAirport;
 
-    // Data i godzina odlotu.
+    /**
+     * Data i godzina odlotu.
+     */
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = true)
     private OffsetDateTime departureDateTime;
 
-    // Liczba dostępnych miejsc.
+    /**
+     * Liczba dostępnych miejsc.
+     */
     @Column(nullable = true)
     private int availableSeatsCount;
 
-    // Pasażerowie przypisani do lotu.
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    /**
+     * Pasażerowie przypisani do lotu.
+     */
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
         name = "flight_passenger",
-        joinColumns = @JoinColumn(name = "flight_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "passenger_id", referencedColumnName = "id")
+        joinColumns = @JoinColumn(name = "flight_id"),
+        inverseJoinColumns = @JoinColumn(name = "passenger_id")
     )
+    @JsonIgnore
     private Set<Passenger> passengers;
 
     /**
@@ -68,10 +84,13 @@ public class Flight {
      *
      * @param passenger Pasażer do dodania.
      */
-    @Transactional(noRollbackFor = Exception.class)
-    public void addPassenger(Passenger passenger) {
-        if (passengers.contains(passenger) || availableSeatsCount == 0) {
+    public void addPassenger(Passenger passenger) throws NoAvailableSeatsException {
+        if (passengers.contains(passenger)) {
             return;
+        }
+
+        if (availableSeatsCount == 0) {
+            throw new NoAvailableSeatsException(id);
         }
 
         passengers.add(passenger);
@@ -81,15 +100,13 @@ public class Flight {
     /**
      * Usuwa pasażera z lotu.
      *
-     * @param passengerId ID pasażera do usunięcia.
-     * @return true jeśli pasażer został usunięty, w przeciwnym razie false.
+     * @param passenger Pasażer do usunięcia.
      */
     @Transactional
-    public boolean deletePassenger(Long passengerId) {
-        if (passengers.removeIf(p -> p.getId() == passengerId)) {
-            availableSeatsCount++;
-            return true;
+    public void deletePassenger(Passenger passenger) {
+        if (!passengers.remove(passenger)) {
+            return;
         }
-        return false;
+        availableSeatsCount++;
     }
 }

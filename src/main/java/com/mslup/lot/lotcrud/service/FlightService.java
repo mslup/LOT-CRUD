@@ -1,14 +1,18 @@
 package com.mslup.lot.lotcrud.service;
 
+import static com.mslup.lot.lotcrud.patcher.FlightPatcher.applyPatchToFlight;
+
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
+import com.mslup.lot.lotcrud.exception.NoAvailableSeatsException;
 import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
 import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.repository.FlightRepository;
 import com.mslup.lot.lotcrud.repository.PassengerRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +26,7 @@ public class FlightService {
     private final PassengerRepository passengerRepository;
 
     /**
-     * Zapisuje lot.
+     * Zapisuje lot w bazie.
      *
      * @param flight Lot do zapisania.
      * @return Zapisany lot.
@@ -36,9 +40,10 @@ public class FlightService {
      *
      * @param id ID lotu do znalezienia.
      * @return Lot o podanym ID, jeśli istnieje.
+     * @throws FlightNotFoundException Jeśli lot o podanym ID nie zostanie znaleziony.
      */
-    public Optional<Flight> findFlight(long id) {
-        return flightRepository.findById(id);
+    public Flight findFlight(long id) throws FlightNotFoundException {
+        return flightRepository.findById(id).orElseThrow(() -> new FlightNotFoundException(id));
     }
 
     /**
@@ -60,38 +65,16 @@ public class FlightService {
         return flightRepository.filterFlights(criteria);
     }
 
-    // todo: move logic to different class
-    private Flight applyPatchToFlight(Flight flight, Flight valuesToPatch) {
-        if (valuesToPatch.getFlightNumber() != null) {
-            flight.setFlightNumber(valuesToPatch.getFlightNumber());
-        }
-        if (valuesToPatch.getOriginAirport() != null) {
-            flight.setOriginAirport(valuesToPatch.getOriginAirport());
-        }
-        if (valuesToPatch.getDestinationAirport() != null) {
-            flight.setDestinationAirport(valuesToPatch.getDestinationAirport());
-        }
-        if (valuesToPatch.getDepartureDateTime() != null) {
-            flight.setDepartureDateTime(valuesToPatch.getDepartureDateTime());
-        }
-        if (valuesToPatch.getAvailableSeatsCount() != -1) {
-            flight.setAvailableSeatsCount(valuesToPatch.getAvailableSeatsCount());
-        }
-        return flight;
-
-    }
-
     /**
      * Aktualizuje dane lotu na podstawie podanego ID i wartości do zaktualizowania.
      *
-     * @param id ID lotu do zaktualizowania.
+     * @param id            ID lotu do zaktualizowania.
      * @param valuesToPatch Wartości do zaktualizowania.
      * @return Zaktualizowany lot.
      * @throws FlightNotFoundException Jeśli lot o podanym ID nie zostanie znaleziony.
      */
-    public Flight patchFlight(long id, Flight valuesToPatch)
-        throws FlightNotFoundException {
-        Flight flight = findFlight(id).orElseThrow(FlightNotFoundException::new);
+    public Flight patchFlight(long id, Flight valuesToPatch) throws FlightNotFoundException {
+        Flight flight = findFlight(id);
 
         Flight patchedFlight = applyPatchToFlight(flight, valuesToPatch);
         flightRepository.save(patchedFlight);
@@ -99,64 +82,70 @@ public class FlightService {
     }
 
     /**
-     * Usuwa lot o podanym ID.
+     * Usuwa lot o podanym ID. Jeżeli taki lot nie istnieje, nic się nie dzieje.
      *
      * @param id ID lotu do usunięcia.
-     * @return Opcjonalny lot, jeśli został usunięty.
      */
-    public Optional<Flight> deleteFlight(long id) {
-        Optional<Flight> flight = flightRepository.findById(id);
+    public void deleteFlight(long id) {
         flightRepository.deleteById(id);
-        return flight;
     }
 
     /**
      * Pobiera listę pasażerów przypisanych do lotu o podanym ID.
      *
-     * @param id ID lotu.
+     * @param flightId ID lotu.
      * @return Lista pasażerów przypisanych do lotu.
      * @throws FlightNotFoundException Jeśli lot o podanym ID nie zostanie znaleziony.
      */
-    public List<Passenger> getPassengers(long id) throws FlightNotFoundException {
-        return flightRepository.findById(id)
+    public List<Passenger> getPassengers(long flightId) throws FlightNotFoundException {
+        return flightRepository.findById(flightId)
             .map(value -> value.getPassengers().stream().toList())
-            .orElseThrow(FlightNotFoundException::new);
+            .orElseThrow(() -> new FlightNotFoundException(flightId));
     }
 
     /**
      * Dodaje pasażera do lotu o podanym ID.
      *
-     * @param flightId ID lotu.
+     * @param flightId    ID lotu.
      * @param passengerId ID pasażera.
-     * @throws FlightNotFoundException Jeśli lot o podanym ID nie zostanie znaleziony.
+     * @throws FlightNotFoundException    Jeśli lot o podanym ID nie zostanie znaleziony.
      * @throws PassengerNotFoundException Jeśli pasażer o podanym ID nie zostanie znaleziony.
      */
+    @Transactional
     public void addPassenger(long flightId, long passengerId)
-        throws FlightNotFoundException, PassengerNotFoundException {
-        Flight flight =
-            flightRepository.findById(flightId).orElseThrow(FlightNotFoundException::new);
-        Passenger passenger =
-            passengerRepository.findById(passengerId).orElseThrow(PassengerNotFoundException::new);
+        throws FlightNotFoundException, PassengerNotFoundException, NoAvailableSeatsException {
+        Flight flight = flightRepository.findById(flightId)
+            .orElseThrow(() -> new FlightNotFoundException(flightId));
+        Passenger passenger = passengerRepository.findById(passengerId)
+            .orElseThrow(() -> new PassengerNotFoundException(passengerId));
 
         flight.addPassenger(passenger);
-
+        passenger.getBookings().add(flight);
         flightRepository.save(flight);
+        passengerRepository.save(passenger);
     }
 
     /**
      * Usuwa pasażera o podanym ID z lotu o podanym ID.
      *
-     * @param flightId ID lotu.
+     * @param flightId    ID lotu.
      * @param passengerId ID pasażera.
      * @throws FlightNotFoundException Jeśli lot o podanym ID nie zostanie znaleziony.
+     * @throws PassengerNotFoundException Jeśli pasażer o podanym ID nie zostanie znaleziony.
      */
-    // todo: rename?? to remove, or use 'bookings'
-    public void deletePassenger(long flightId, long passengerId) throws FlightNotFoundException {
-        Flight flight =
-            flightRepository.findById(flightId).orElseThrow(FlightNotFoundException::new);
+    @Transactional
+    public void deletePassenger(long flightId, long passengerId)
+        throws FlightNotFoundException,
+        PassengerNotFoundException {
+        Flight flight = flightRepository.findById(flightId)
+            .orElseThrow(() -> new FlightNotFoundException(flightId));
+        Passenger passenger = passengerRepository.findById(passengerId)
+            .orElseThrow(() -> new PassengerNotFoundException(passengerId));
 
-        flight.deletePassenger(passengerId);
+        flight.deletePassenger(passenger);
+        passenger.getBookings().remove(flight);
 
         flightRepository.save(flight);
+        passengerRepository.save(passenger);
     }
 }

@@ -1,13 +1,13 @@
 package com.mslup.lot.lotcrud;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.PassengerService;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -25,11 +25,9 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
     @Order(1)
     public void givenPassenger_whenAddPassenger_thenPassengerIsAdded() {
         // Given
-        Passenger passenger = Passenger.builder()
-            .firstName("Jan")
-            .lastName("Kowalski")
-            .phoneNumber("+48111222333")
-            .build();
+        Passenger passenger =
+            Passenger.builder().firstName("Jan").lastName("Kowalski").phoneNumber("+48111222333")
+                .build();
 
         // When
         Passenger returnedPassenger = passengerService.savePassenger(passenger);
@@ -49,7 +47,7 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         passengerService.savePassenger(Passenger.builder().build());
 
         // When
-        List<Passenger> passengers = passengerService.getAllPassengers();
+        List<Passenger> passengers = passengerService.getPassengers();
 
         // Then
         assertThat(passengers).isNotNull();
@@ -60,11 +58,8 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
     @Order(3)
     public void givenPassenger_whenPatch_thenPatchedCorrectly() {
         // Given
-        Optional<Passenger> passenger = passengerService.findPassenger(1);
-        Passenger patch = Passenger.builder()
-            .firstName("Adam")
-            .lastName("Krawczyk")
-            .build();
+        Passenger passenger = passengerService.findPassenger(1);
+        Passenger patch = Passenger.builder().firstName("Adam").lastName("Krawczyk").build();
 
         // When
         try {
@@ -74,11 +69,10 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         }
 
         // Then
-        Optional<Passenger> patchedPassenger = passengerService.findPassenger(1);
-        assertThat(patchedPassenger.orElseThrow().getFirstName()).isEqualTo("Adam");
-        assertThat(patchedPassenger.orElseThrow().getLastName()).isEqualTo("Krawczyk");
-        assertThat(patchedPassenger.orElseThrow().getPhoneNumber()).isEqualTo(
-            passenger.orElseThrow().getPhoneNumber());
+        Passenger patchedPassenger = passengerService.findPassenger(1);
+        assertThat(patchedPassenger.getFirstName()).isEqualTo("Adam");
+        assertThat(patchedPassenger.getLastName()).isEqualTo("Krawczyk");
+        assertThat(patchedPassenger.getPhoneNumber()).isEqualTo(passenger.getPhoneNumber());
     }
 
     @Test
@@ -90,10 +84,8 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         passengerService.deletePassenger(3);
 
         // Then
-        List<Passenger> passengers = passengerService.getAllPassengers();
+        List<Passenger> passengers = passengerService.getPassengers();
         assertThat(passengers.size()).isEqualTo(4);
-
-        Optional<Passenger> passenger = passengerService.findPassenger(3);
-        assertThat(passenger).isNotPresent();
+        assertThrows(PassengerNotFoundException.class, () ->  passengerService.findPassenger(3));
     }
 }

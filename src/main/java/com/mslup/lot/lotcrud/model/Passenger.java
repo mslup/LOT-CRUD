@@ -1,5 +1,6 @@
 package com.mslup.lot.lotcrud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,7 +56,9 @@ public class Passenger {
     @ManyToMany(
         mappedBy = "passengers",
         cascade = CascadeType.ALL,
-        fetch = FetchType.EAGER
+        fetch = FetchType.LAZY
     )
-    private Set<Flight> bookings;
+    @JsonIgnore
+    @Builder.Default
+    private Set<Flight> bookings = new HashSet<>();
 }

@@ -1,10 +1,11 @@
 package com.mslup.lot.lotcrud.service;
 
+import static com.mslup.lot.lotcrud.patcher.PassengerPatcher.applyPatchToPassenger;
+
 import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.repository.PassengerRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class PassengerService {
      *
      * @return Lista wszystkich pasażerów.
      */
-    public List<Passenger> getAllPassengers() {
+    public List<Passenger> getPassengers() {
         return passengerRepository.findAll();
     }
 
@@ -31,12 +32,13 @@ public class PassengerService {
      * @param id ID pasażera do znalezienia.
      * @return Pasażer o podanym ID, jeśli istnieje.
      */
-    public Optional<Passenger> findPassenger(long id) {
-        return passengerRepository.findById(id);
+    public Passenger findPassenger(long id) throws PassengerNotFoundException {
+        return passengerRepository.findById(id)
+            .orElseThrow(() -> new PassengerNotFoundException(id));
     }
 
     /**
-     * Zapisuje pasażera.
+     * Zapisuje pasażera w bazie.
      *
      * @param passenger Pasażer do zapisania.
      * @return Zapisany pasażer.
@@ -45,37 +47,18 @@ public class PassengerService {
         return passengerRepository.save(passenger);
     }
 
-    /**
-     * Metoda pomocnicza do zastosowania zmiany na pasażerze.
-     *
-     * @param passenger Aktualny pasażer.
-     * @param valuesToPatch Wartości do zaktualizowania.
-     * @return Zaktualizowany pasażer.
-     */
-    private Passenger applyPatchToPassenger(Passenger passenger, Passenger valuesToPatch) {
-        if (valuesToPatch.getFirstName() != null) {
-            passenger.setFirstName(valuesToPatch.getFirstName());
-        }
-        if (valuesToPatch.getLastName() != null) {
-            passenger.setLastName(valuesToPatch.getLastName());
-        }
-        if (valuesToPatch.getPhoneNumber() != null) {
-            passenger.setPhoneNumber(valuesToPatch.getPhoneNumber());
-        }
-        return passenger;
-    }
 
     /**
      * Aktualizuje dane pasażera na podstawie podanego ID i wartości do zaktualizowania.
      *
-     * @param id ID pasażera do zaktualizowania.
+     * @param id            ID pasażera do zaktualizowania.
      * @param valuesToPatch Wartości do zaktualizowania.
      * @return Zaktualizowany pasażer.
      * @throws PassengerNotFoundException Jeśli pasażer o podanym ID nie zostanie znaleziony.
      */
     public Passenger patchPassenger(long id, Passenger valuesToPatch)
         throws PassengerNotFoundException {
-        Passenger passenger = findPassenger(id).orElseThrow(PassengerNotFoundException::new);
+        Passenger passenger = findPassenger(id);
 
         Passenger patchedPassenger = applyPatchToPassenger(passenger, valuesToPatch);
         passengerRepository.save(patchedPassenger);
@@ -83,14 +66,11 @@ public class PassengerService {
     }
 
     /**
-     * Usuwa pasażera o podanym ID.
+     * Usuwa pasażera o podanym ID.  Jeżeli taki pasażer nie istnieje, nic się nie dzieje.
      *
      * @param id ID pasażera do usunięcia.
-     * @return Opcjonalny pasażer, jeśli został usunięty.
      */
-    public Optional<Passenger> deletePassenger(long id) {
-        Optional<Passenger> passenger = passengerRepository.findById(id);
+    public void deletePassenger(long id) {
         passengerRepository.deleteById(id);
-        return passenger;
     }
 }
