@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.mslup.lot.lotcrud.exception.FlightNotFoundException;
+import com.mslup.lot.lotcrud.exception.PassengerNotFoundException;
 import com.mslup.lot.lotcrud.filter.FlightFilterCriteria;
 import com.mslup.lot.lotcrud.model.Flight;
 import com.mslup.lot.lotcrud.model.Passenger;
@@ -20,9 +21,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@DirtiesContext
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FlightServiceTest extends LotCrudApplicationTests {
     @Autowired
@@ -30,7 +33,6 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     @Autowired
     private PassengerService passengerService;
 
-    // todo: add example data before all tests, remove passengerService
     @Test
     @Order(1)
     public void givenFlight_whenAddFlight_thenFlightIsAdded() {
@@ -261,6 +263,8 @@ public class FlightServiceTest extends LotCrudApplicationTests {
             flightService.deletePassenger(1, 1);
         } catch (FlightNotFoundException e) {
             fail("Flight with id = 1 not found");
+        } catch (PassengerNotFoundException e) {
+            fail("Passenger with id = 1 not found");
         }
 
         // Then
@@ -269,6 +273,8 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         assertThat(flightAfter.getPassengers().size()).isEqualTo(0);
         Passenger passenger = passengerService.findPassenger(1);
         assertThat(passenger.getBookings().size()).isEqualTo(0);
+
+        passengerService.deletePassenger(1L);
     }
 
 }
