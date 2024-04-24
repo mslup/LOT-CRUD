@@ -38,7 +38,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Obsługuje wyjątek {@link java.lang.reflect.Method}.
+     * Obsługuje wyjątek {@link MethodArgumentNotValidException}.
      *
      * @param ex      wyjątek rzucany, gdy argument metody nie jest prawidłowy
      * @param headers nagłówki HTTP, które będą wysłane do klienta

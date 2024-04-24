@@ -11,6 +11,7 @@ import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.FlightService;
 import com.mslup.lot.lotcrud.service.PassengerService;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -29,17 +30,19 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     @Autowired
     private PassengerService passengerService;
 
-
     // todo: add example data before all tests, remove passengerService
     @Test
     @Order(1)
     public void givenFlight_whenAddFlight_thenFlightIsAdded() {
         // Given
-        Flight flight = Flight.builder().destinationAirport("WWA").originAirport("NYC")
-            //.departureDateTime(OffsetDateTime.parse("2007-12-03T10:15:30+01:00"))
-            .availableSeatsCount(23).build();
+        Flight flight = Flight.builder()
+            .flightNumber("FL1234")
+            .originAirport("JFK")
+            .destinationAirport("LAX")
+            .departureDateTime(OffsetDateTime.parse("2024-04-23T15:00:00-04:00"))
+            .availableSeatsCount(200)
+            .build();
 
-        //OffsetDateTime.parse("")
         // When
         Flight returnedFlight = flightService.saveFlight(flight);
 
@@ -48,21 +51,77 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         assertThat(returnedFlight).usingRecursiveComparison().isEqualTo(flight);
     }
 
+    public void prepareData() {
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL5678")
+            .originAirport("JFK")
+            .destinationAirport("LAX")
+            .departureDateTime(OffsetDateTime.parse("2024-04-24T10:00:00+01:00"))
+            .availableSeatsCount(150)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL91011")
+            .originAirport("LAX")
+            .destinationAirport("JFK")
+            .departureDateTime(OffsetDateTime.parse("2024-04-25T22:00:00+04:00"))
+            .availableSeatsCount(300)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL1213")
+            .originAirport("JFK")
+            .destinationAirport("LAX")
+            .departureDateTime(OffsetDateTime.parse("2024-04-26T09:00:00-07:00"))
+            .availableSeatsCount(180)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL1415")
+            .originAirport("BOS")
+            .destinationAirport("MIA")
+            .departureDateTime(OffsetDateTime.parse("2024-04-27T14:00:00-04:00"))
+            .availableSeatsCount(220)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL1617")
+            .originAirport("NRT")
+            .destinationAirport("LAX")
+            .departureDateTime(OffsetDateTime.parse("2024-04-28T21:00:00+09:00"))
+            .availableSeatsCount(250)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL1819")
+            .originAirport("AMS")
+            .destinationAirport("JFK")
+            .departureDateTime(OffsetDateTime.parse("2024-04-29T11:00:00+01:00"))
+            .availableSeatsCount(300)
+            .passengers(new HashSet<>())
+            .build());
+        flightService.saveFlight(Flight.builder()
+            .flightNumber("FL2021")
+            .originAirport("JFK")
+            .destinationAirport("CAI")
+            .departureDateTime(OffsetDateTime.parse("2024-04-30T17:00:00+03:00"))
+            .availableSeatsCount(350)
+            .passengers(new HashSet<>())
+            .build());
+    }
+
     @Test
     @Order(2)
     public void givenFlightList_whenGetAllFlights_thenAllFlightsAreReturned() {
         // Given
-        flightService.saveFlight(Flight.builder().build());
-        flightService.saveFlight(Flight.builder().build());
-        flightService.saveFlight(Flight.builder().build());
-        flightService.saveFlight(Flight.builder().build());
+        prepareData();
 
         // When
         List<Flight> flightList = flightService.getFlights();
 
         // Then
         assertThat(flightList).isNotNull();
-        assertThat(flightList.size()).isEqualTo(5);
+        assertThat(flightList.size()).isEqualTo(8);
     }
 
     @Test
@@ -70,7 +129,7 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     public void givenFlight_whenPatch_thenPatchedCorrectly() {
         // Given
         Flight flight = flightService.findFlight(1);
-        Flight patch = Flight.builder().destinationAirport("BUD").availableSeatsCount(200).build();
+        Flight patch = Flight.builder().destinationAirport("WAW").availableSeatsCount(200).build();
 
         // When
         flightService.patchFlight(1, patch);
@@ -78,8 +137,8 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         // Then
         Flight patchedFlight = flightService.findFlight(1);
 
-        assertThat(patchedFlight.getDestinationAirport()).isEqualTo("BUD");
-        assertThat(patchedFlight.getAvailableSeatsCount()).isEqualTo(200L);
+        assertThat(patchedFlight.getDestinationAirport()).isEqualTo("WAW");
+        assertThat(patchedFlight.getAvailableSeatsCount()).isEqualTo(200);
         assertThat(patchedFlight.getFlightNumber()).isEqualTo(flight.getFlightNumber());
         assertThat(patchedFlight.getOriginAirport()).isEqualTo(flight.getOriginAirport());
         assertThat(patchedFlight.getDepartureDateTime()).isEqualTo(flight.getDepartureDateTime());
@@ -91,31 +150,20 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         // Given
 
         // When
-        flightService.deleteFlight(4);
+        flightService.deleteFlight(8);
 
         // Then
         List<Flight> flights = flightService.getFlights();
-        assertThat(flights.size()).isEqualTo(4);
-        assertThrows(FlightNotFoundException.class, () -> flightService.findFlight(4));
+        assertThat(flights.size()).isEqualTo(7);
+        assertThrows(FlightNotFoundException.class, () -> flightService.findFlight(8));
     }
 
     @Test
     @Order(5)
     public void givenAirportCriteria_whenFilter_thenReturnCorrect() {
         // Given
-        flightService.saveFlight(
-            Flight.builder().originAirport("WWA").destinationAirport("KVN").build());
-        flightService.saveFlight(
-            Flight.builder().originAirport("WWA").destinationAirport("KVN").build());
-        flightService.saveFlight(
-            Flight.builder().originAirport("KVN").destinationAirport("WWA").build());
-        flightService.saveFlight(
-            Flight.builder().originAirport("KRK").destinationAirport("KVN").build());
-        flightService.saveFlight(
-            Flight.builder().originAirport("NYC").destinationAirport("KVN").build());
-
         FlightFilterCriteria criteria =
-            FlightFilterCriteria.builder().originAirport("WWA").destinationAirport("KVN").build();
+            FlightFilterCriteria.builder().originAirport("JFK").destinationAirport("LAX").build();
 
         // When
         List<Flight> flights = flightService.getFlights(criteria);
@@ -124,8 +172,8 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         assertThat(flights.size()).isEqualTo(2);
 
         for (Flight flight : flights) {
-            assertThat(flight.getOriginAirport()).isEqualTo("WWA");
-            assertThat(flight.getDestinationAirport()).isEqualTo("KVN");
+            assertThat(flight.getOriginAirport()).isEqualTo("JFK");
+            assertThat(flight.getDestinationAirport()).isEqualTo("LAX");
         }
     }
 
@@ -133,21 +181,9 @@ public class FlightServiceTest extends LotCrudApplicationTests {
     @Order(6)
     public void givenDateFromOrTo_whenFilter_thenReturnCorrect() {
         // Given
-        flightService.saveFlight(
-            Flight.builder().departureDateTime(OffsetDateTime.parse("2024-05-15T14:32:00+01:00"))
-                .build());
-        flightService.saveFlight(
-            Flight.builder().departureDateTime(OffsetDateTime.parse("2024-06-15T14:32:00+01:00"))
-                .build());
-        flightService.saveFlight(
-            Flight.builder().departureDateTime(OffsetDateTime.parse("2024-07-15T14:32:00+01:00"))
-                .build());
-        flightService.saveFlight(
-            Flight.builder().departureDateTime(OffsetDateTime.parse("2023-07-15T14:32:00+01:00"))
-                .build());
 
         // When
-        OffsetDateTime date = OffsetDateTime.parse("2024-06-15T14:32:00+01:00");
+        OffsetDateTime date = OffsetDateTime.parse("2024-04-28T21:00:00+09:00");
         FlightFilterCriteria criteriaAfter = FlightFilterCriteria.builder().dateFrom(date).build();
         List<Flight> flightsAfter = flightService.getFlights(criteriaAfter);
 
@@ -160,7 +196,7 @@ public class FlightServiceTest extends LotCrudApplicationTests {
             assertThat(flight.getDepartureDateTime()).isAfterOrEqualTo(date);
         }
 
-        assertThat(flightsBefore.size()).isEqualTo(3);
+        assertThat(flightsBefore.size()).isEqualTo(6);
         for (Flight flight : flightsBefore) {
             assertThat(flight.getDepartureDateTime()).isBeforeOrEqualTo(date);
         }
@@ -172,14 +208,14 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         // Given
 
         // When
-        OffsetDateTime dateFrom = OffsetDateTime.parse("2024-06-10T00:00:00-04:00");
-        OffsetDateTime dateTo = OffsetDateTime.parse("2024-06-20T00:00:00+10:00");
+        OffsetDateTime dateFrom = OffsetDateTime.parse("2024-04-25T22:00:00+04:00");
+        OffsetDateTime dateTo = OffsetDateTime.parse("2024-04-28T21:00:00+09:00");
         FlightFilterCriteria criteria =
             FlightFilterCriteria.builder().dateFrom(dateFrom).dateTo(dateTo).build();
         List<Flight> flights = flightService.getFlights(criteria);
 
         // Then
-        assertThat(flights.size()).isEqualTo(1);
+        assertThat(flights.size()).isEqualTo(4);
         for (Flight flight : flights) {
             assertThat(flight.getDepartureDateTime()).isBetween(dateFrom, dateTo);
         }
@@ -194,7 +230,11 @@ public class FlightServiceTest extends LotCrudApplicationTests {
         Flight flight = flightService.findFlight(1);
         long seatsCount = flight.getAvailableSeatsCount();
 
-        passengerService.savePassenger(Passenger.builder().build());
+        passengerService.savePassenger(Passenger.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .phoneNumber("123-456-7890")
+            .build());
 
         // When
         flightService.addPassenger(1, 1);

@@ -25,9 +25,11 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
     @Order(1)
     public void givenPassenger_whenAddPassenger_thenPassengerIsAdded() {
         // Given
-        Passenger passenger =
-            Passenger.builder().firstName("Jan").lastName("Kowalski").phoneNumber("+48111222333")
-                .build();
+        Passenger passenger = Passenger.builder()
+            .firstName("Jan")
+            .lastName("Kowalski")
+            .phoneNumber("+48111222333")
+            .build();
 
         // When
         Passenger returnedPassenger = passengerService.savePassenger(passenger);
@@ -41,17 +43,28 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
     @Order(2)
     public void givenPassengerList_whenGetAllPassengers_thenAllPassengersAreReturned() {
         // Given
-        passengerService.savePassenger(Passenger.builder().build());
-        passengerService.savePassenger(Passenger.builder().build());
-        passengerService.savePassenger(Passenger.builder().build());
-        passengerService.savePassenger(Passenger.builder().build());
+        passengerService.savePassenger(Passenger.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .phoneNumber("123-456-7890")
+            .build());
+        passengerService.savePassenger(Passenger.builder()
+            .firstName("Jane")
+            .lastName("Smith")
+            .phoneNumber("098-765-4321")
+            .build());
+        passengerService.savePassenger(Passenger.builder()
+            .firstName("Alice")
+            .lastName("Johnson")
+            .phoneNumber("456-123-7890")
+            .build());
 
         // When
         List<Passenger> passengers = passengerService.getPassengers();
 
         // Then
         assertThat(passengers).isNotNull();
-        assertThat(passengers.size()).isEqualTo(5);
+        assertThat(passengers.size()).isEqualTo(4);
     }
 
     @Test
@@ -65,7 +78,7 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         try {
             passengerService.patchPassenger(1, patch);
         } catch (PassengerNotFoundException e) {
-            fail();
+            fail("Passenger with id = 1 not found");
         }
 
         // Then
@@ -81,11 +94,11 @@ public class PassengerServiceTest extends LotCrudApplicationTests {
         // Given
 
         // When
-        passengerService.deletePassenger(3);
+        passengerService.deletePassenger(2);
 
         // Then
         List<Passenger> passengers = passengerService.getPassengers();
-        assertThat(passengers.size()).isEqualTo(4);
-        assertThrows(PassengerNotFoundException.class, () ->  passengerService.findPassenger(3));
+        assertThat(passengers.size()).isEqualTo(3);
+        assertThrows(PassengerNotFoundException.class, () -> passengerService.findPassenger(2));
     }
 }

@@ -39,32 +39,32 @@ public class Flight {
     /**
      * Numer lotu.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     //@NotNull(message = "Flight number cannot be null - model")
     private String flightNumber;
 
     /**
      * Kod lotniska początkowego.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String originAirport;
 
     /**
      * Kod lotniska docelowego.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String destinationAirport;
 
     /**
      * Data i godzina odlotu.
      */
-    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = true)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
     private OffsetDateTime departureDateTime;
 
     /**
      * Liczba dostępnych miejsc.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private int availableSeatsCount;
 
     /**

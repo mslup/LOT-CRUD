@@ -35,19 +35,19 @@ public class Passenger {
     /**
      * Imię pasażera.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String firstName;
 
     /**
      * Nazwisko pasażera.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String lastName;
 
     /**
      * Numer telefonu pasażera.
      */
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String phoneNumber;
 
     /**
