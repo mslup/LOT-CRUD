@@ -38,6 +38,12 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+test {
+    testLogging {
+        events "passed", "failed"
+    }
+}
+
 jar {
     enabled = false
 }

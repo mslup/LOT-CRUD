@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,16 +32,14 @@ public class FlightPassengerController {
      *
      * @param id ID lotu.
      * @return {@code ResponseEntity} z listą pasażerów.
+     * @throws FlightNotFoundException Jeśli lot o podanym ID nie został znaleziony.
      */
     @GetMapping(path = "/{id}/passengers")
     @ResponseBody
-    public ResponseEntity<List<Passenger>> getPassengers(@PathVariable long id) {
-        try {
-            List<Passenger> passengers = flightService.getPassengers(id);
-            return ResponseEntity.ok(passengers);
-        } catch (FlightNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<List<Passenger>> getPassengers(@PathVariable long id)
+        throws FlightNotFoundException {
+        List<Passenger> passengers = flightService.getPassengers(id);
+        return ResponseEntity.ok(passengers);
     }
 
     /**
@@ -70,7 +67,7 @@ public class FlightPassengerController {
      * @param id          ID lotu.
      * @param passengerId ID pasażera.
      * @return {@code ResponseEntity} bez zawartości. Jeśli lot nie istnieje,
-     *      nic się nie dzieje.
+     *     nic się nie dzieje.
      */
     @DeleteMapping(path = "/{id}/passengers")
     @ApiResponse(responseCode = "204", description = "Operacja usuwania powiodła się")

@@ -7,6 +7,7 @@ import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.service.PassengerService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class PassengerController {
      */
     @PostMapping
     @ResponseBody
-    public ResponseEntity<Passenger> addPassenger(@RequestBody PassengerDto passenger) {
+    public ResponseEntity<Passenger> addPassenger(@Valid @RequestBody PassengerDto passenger) {
         return ResponseEntity.ok(
             passengerService.savePassenger(passengerDtoMapper.apply(passenger)));
     }
