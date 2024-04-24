@@ -112,8 +112,9 @@ public class FlightController {
                                                @RequestParam Optional<String> destinationAirport,
                                                @RequestParam
                                                Optional<OffsetDateTime> departureDateTime,
-                                               @Min(value = 10) @Max(value = 500) @RequestParam
-                                               Optional<Integer> availableSeatsCount) {
+                                               @RequestParam
+                                               Optional<@Min(value = 10) @Max(value = 500) Integer>
+                                                   availableSeatsCount) {
         Flight patch = Flight.builder().flightNumber(flightNumber.orElse(null))
             .originAirport(originAirport.orElse(null))
             .destinationAirport(destinationAirport.orElse(null))
@@ -125,11 +126,10 @@ public class FlightController {
     }
 
     /**
-     * Usuwa lot na podstawie ID.
+     * Usuwa lot na podstawie ID. Jeśli lot nie istnieje, nic się nie dzieje.
      *
      * @param id ID lotu.
-     * @return {@code ResponseEntity} bez zawartości. Jeśli lot nie istnieje,
-     *     nic się nie dzieje.
+     * @return {@code ResponseEntity} bez zawartości.
      */
     @DeleteMapping(path = "/{id}")
     @ApiResponse(responseCode = "204", description = "Operacja usuwania powiodła się")

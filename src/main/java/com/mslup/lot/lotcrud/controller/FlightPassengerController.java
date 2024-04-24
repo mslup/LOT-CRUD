@@ -69,14 +69,16 @@ public class FlightPassengerController {
      *
      * @param id          ID lotu.
      * @param passengerId ID pasażera.
-     * @return {@code ResponseEntity} bez zawartości. Jeśli lot nie istnieje,
-     *     nic się nie dzieje.
+     * @return {@code ResponseEntity} bez zawartości.
+     * @throws FlightNotFoundException    Jeśli lot o podanym ID nie zostanie znaleziony.
+     * @throws PassengerNotFoundException Jeśli pasażer o podanym ID nie zostanie znaleziony.
      */
     @DeleteMapping(path = "/{id}/passengers")
     @ApiResponse(responseCode = "204", description = "Operacja usuwania powiodła się")
     @ResponseBody
     public ResponseEntity<Void> deletePassenger(@PathVariable Long id,
-                                                @RequestParam Long passengerId) {
+                                                @RequestParam Long passengerId)
+        throws FlightNotFoundException, PassengerNotFoundException {
         flightService.deletePassenger(id, passengerId);
         return ResponseEntity.noContent().build();
     }

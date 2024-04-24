@@ -84,9 +84,9 @@ public class PassengerController {
     @ResponseBody
     public ResponseEntity<Passenger> updatePassenger(
         @PathVariable long id,
-        @Size(min = 2, max = 40) @RequestParam Optional<String> firstName,
-        @Size(min = 2, max = 40) @RequestParam Optional<String> lastName,
-        @Size(min = 5, max = 20) @RequestParam Optional<String> phoneNumber)
+        @RequestParam Optional<@Size(min = 2, max = 40) String> firstName,
+        @RequestParam Optional<@Size(min = 2, max = 40) String> lastName,
+        @RequestParam Optional<@Size(min = 5, max = 20) String> phoneNumber)
         throws PassengerNotFoundException {
         Passenger patch = Passenger.builder()
             .firstName(firstName.orElse(null))
@@ -99,11 +99,10 @@ public class PassengerController {
     }
 
     /**
-     * Usuwa pasażera na podstawie ID.
+     * Usuwa pasażera na podstawie ID. Jeśli pasażer nie istnieje, nic się nie dzieje.
      *
      * @param id ID pasażera.
-     * @return {@code ResponseEntity} bez zawartości. Jeśli pasażer nie istnieje,
-     *      nic się nie dzieje.
+     * @return {@code ResponseEntity} bez zawartości.
      */
     @DeleteMapping(path = "/{id}")
     @ResponseBody

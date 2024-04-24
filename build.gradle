@@ -25,7 +25,6 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers'
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-    implementation 'com.github.java-json-tools:json-patch:1.12'
 
     // For reading JavaDocs at compile time
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
