@@ -1,4 +1,4 @@
-### System zarządzania lotami i pasażerami
+# System zarządzania lotami i pasażerami
 
 ## Wymagania
 - Java 21
