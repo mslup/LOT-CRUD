@@ -11,7 +11,7 @@
 ```bash
 docker compose up 
 ```
-3. Aplikacja jest uruchumiona na porcie `http://localhost:8080`.
+3. Aplikacja jest uruchomiona na porcie `http://localhost:8080`.
 
 ## Testowanie
 Uruchom komendę:
