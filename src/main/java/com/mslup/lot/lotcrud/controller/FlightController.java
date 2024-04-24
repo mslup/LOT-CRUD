@@ -40,14 +40,15 @@ public class FlightController {
 
     /**
      * Pobiera listę lotów na podstawie kryteriów filtrowania.
+     * Parametry mogą być puste.
      * Jeśli kryteria są puste, zwraca wszystkie loty.
      *
-     * @param originAirport      Opcjonalne: kod lotniska początkowego.
-     * @param destinationAirport Opcjonalne: kod lotniska docelowego.
-     * @param dateFrom           Opcjonalne: data początkowa.
-     * @param dateTo             Opcjonalne: data końcowa.
-     * @param seatsCountFrom     Opcjonalne: minimalna liczba miejsc.
-     * @param seatsCountTo       Opcjonalne: maksymalna liczba miejsc.
+     * @param originAirport      Kod lotniska początkowego.
+     * @param destinationAirport Kod lotniska docelowego.
+     * @param dateFrom           Data początkowa (w formacie ISO-8601: YYYY-MM-DDThh:mm:ss±hh:mm).
+     * @param dateTo             Data końcowa (w formacie ISO-8601: YYYY-MM-DDThh:mm:ss±hh:mm).
+     * @param seatsCountFrom     Minimalna liczba miejsc.
+     * @param seatsCountTo       Maksymalna liczba miejsc.
      * @return {@code ResponseEntity} z listą lotów spełniających kryteria.
      */
     @GetMapping
@@ -95,13 +96,15 @@ public class FlightController {
 
     /**
      * Aktualizuje szczegóły lotu o danym ID na podstawie podanych parametrów.
+     * Parametry mogą być puste.
      *
      * @param id                  ID lotu.
-     * @param flightNumber        Opcjonalne: nowy numer lotu.
-     * @param originAirport       Opcjonalne: nowy kod lotniska początkowego.
-     * @param destinationAirport  Opcjonalne: nowy kod lotniska docelowego.
-     * @param departureDateTime   Opcjonalne: nowa data i godzina odlotu.
-     * @param availableSeatsCount Opcjonalne: nowa liczba dostępnych miejsc.
+     * @param flightNumber        Nowy numer lotu.
+     * @param originAirport       Nowy kod lotniska początkowego.
+     * @param destinationAirport  Nowy kod lotniska docelowego.
+     * @param departureDateTime   Nowa data i godzina odlotu
+     *                            (w formacie ISO-8601: YYYY-MM-DDThh:mm:ss±hh:mm).
+     * @param availableSeatsCount Nowa liczba dostępnych miejsc (w przedziale od 10 do 500).
      * @return {@code ResponseEntity} z zaktualizowanym lotem.
      */
     @PatchMapping(path = "/{id}")

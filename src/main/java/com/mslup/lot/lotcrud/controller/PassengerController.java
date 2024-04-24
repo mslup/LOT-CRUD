@@ -72,12 +72,12 @@ public class PassengerController {
     }
 
     /**
-     * Aktualizuje szczegóły pasażera na podstawie ID.
+     * Aktualizuje szczegóły pasażera na podstawie ID. Parametry są opcjonalne.
      *
      * @param id          ID pasażera.
-     * @param firstName   Opcjonalne: nowe imię pasażera.
-     * @param lastName    Opcjonalne: nowe nazwisko pasażera.
-     * @param phoneNumber Opcjonalne: nowy numer telefonu pasażera.
+     * @param firstName   Nowe imię pasażera (długość od 2 do 40).
+     * @param lastName    Nowe nazwisko pasażera (długość od 2 do 40).
+     * @param phoneNumber Nowy numer telefonu pasażera (długość od 5 do 20).
      * @return {@code ResponseEntity} z zaktualizowanym pasażerem.
      */
     @PatchMapping(path = "/{id}")
