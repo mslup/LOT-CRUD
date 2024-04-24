@@ -2,9 +2,7 @@ package com.mslup.lot.lotcrud;
 
 import java.io.File;
 import java.time.Duration;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

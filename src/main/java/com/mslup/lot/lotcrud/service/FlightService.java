@@ -10,7 +10,6 @@ import com.mslup.lot.lotcrud.model.Flight;
 import com.mslup.lot.lotcrud.model.Passenger;
 import com.mslup.lot.lotcrud.repository.FlightRepository;
 import com.mslup.lot.lotcrud.repository.PassengerRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

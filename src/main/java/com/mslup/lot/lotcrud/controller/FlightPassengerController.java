@@ -58,7 +58,7 @@ public class FlightPassengerController {
     @PostMapping(path = "/{id}/passengers")
     @ResponseBody
     public ResponseEntity<Void> addPassenger(@PathVariable Long id,
-                                          @RequestParam Long passengerId)
+                                             @RequestParam Long passengerId)
         throws PassengerNotFoundException, FlightNotFoundException, NoAvailableSeatsException {
         flightService.addPassenger(id, passengerId);
         return ResponseEntity.ok().build();
