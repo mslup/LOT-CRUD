@@ -13,6 +13,12 @@ docker compose up
 ```
 3. Aplikacja jest uruchumiona na porcie `http://localhost:8080`.
 
+## Testowanie
+Uruchom komendę:
+```bash
+./gradlew test
+```
+
 ## Dokumentacja
 Dokumentacja endpointów SwaggerUI znajduje się pod adresem `http://localhost:8080/swagger-ui/index.html`. 
 Dokumentacja JavaDocs //todo
