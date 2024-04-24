@@ -8,6 +8,7 @@ import com.mslup.lot.lotcrud.service.PassengerService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -83,9 +84,9 @@ public class PassengerController {
     @ResponseBody
     public ResponseEntity<Passenger> updatePassenger(
         @PathVariable long id,
-        @RequestParam Optional<String> firstName,
-        @RequestParam Optional<String> lastName,
-        @RequestParam Optional<String> phoneNumber)
+        @Size(min = 2, max = 40) @RequestParam Optional<String> firstName,
+        @Size(min = 2, max = 40) @RequestParam Optional<String> lastName,
+        @Size(min = 5, max = 20) @RequestParam Optional<String> phoneNumber)
         throws PassengerNotFoundException {
         Passenger patch = Passenger.builder()
             .firstName(firstName.orElse(null))

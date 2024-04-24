@@ -9,6 +9,8 @@ import com.mslup.lot.lotcrud.service.FlightService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Kontroler obsługujący loty.
+ * Kontroler obsługujący zasoby lotów.
  */
 @RestController
 @RequestMapping("/flights")
@@ -110,7 +112,7 @@ public class FlightController {
                                                @RequestParam Optional<String> destinationAirport,
                                                @RequestParam
                                                Optional<OffsetDateTime> departureDateTime,
-                                               @RequestParam
+                                               @Min(value = 10) @Max(value = 500) @RequestParam
                                                Optional<Integer> availableSeatsCount) {
         Flight patch = Flight.builder().flightNumber(flightNumber.orElse(null))
             .originAirport(originAirport.orElse(null))
@@ -127,7 +129,7 @@ public class FlightController {
      *
      * @param id ID lotu.
      * @return {@code ResponseEntity} bez zawartości. Jeśli lot nie istnieje,
-     *      nic się nie dzieje.
+     *     nic się nie dzieje.
      */
     @DeleteMapping(path = "/{id}")
     @ApiResponse(responseCode = "204", description = "Operacja usuwania powiodła się")
